@@ -1,0 +1,16 @@
+**/obj
+**/bin
+/.vs/
+*.vspx
+*.psess
+*ConnectionStrings.config
+*.dbml
+*.DS_Store
+**/.idea
+
+### Resharper temporary files
+_ReSharper.Caches/
+*.csproj.user
+tools/MS.SqlScriptHelper/.vs/MS.SqlScriptHelper/v15/
+/packages/
+/.vs/

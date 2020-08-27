@@ -1,0 +1,340 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+
+<script>
+    var module = angular.module('ms.module', ['ngAnimate', 'ngMessages', 'toaster'], function () { });
+    module.controller('TraderController', function ($scope, $http, toaster) {
+        $scope.model = {};
+        $scope.trader = function (tdr) {
+            $scope.Id = tdr.Id;
+            $scope.TraderId = tdr.TraderId;
+            $scope.LegalName = tdr.Trader.LegalName;
+            $scope.TradingName = tdr.Trader.TradingName;
+            $scope.Address1 = tdr.Address1;
+            $scope.Address2 = tdr.Address2;
+            $scope.City = tdr.City;
+            $scope.Post = tdr.Post;
+            $scope.UpdatedOn = tdr.UpdatedOn;
+            $scope.UpdatedBy = tdr.UpdatedBy;
+        };// traders
+        $scope.reset = function () {
+            $scope.Id = '';
+            $scope.LegalName = '';
+            $scope.TradingName = '';
+            $scope.Address1 = '';
+            $scope.Address2 = '';
+            $scope.City = '';
+            $scope.Post = '';
+            $scope.UpdatedOn = '';
+            $scope.AddNewForm.$setPristine();
+            $scope.AddNewForm.$setUntouched();
+            $scope.UpdateTraderForm.$setPristine();
+            $scope.UpdateTraderForm.$setUntouched();
+            $('#UpdateModal').modal('hide');
+            $('#AddNew').modal('hide');
+        };// reset
+        $scope.query = function () {
+            var url = '@Url.Action("Query")';
+            $http.get(url).then(function (response) {
+                $scope.model = response.data;
+            });
+        };// query
+        $scope.create = function () {
+            var trader = {
+                Id: $scope.Id,
+                LegalName: $scope.LegalName,
+                TradingName: $scope.TradingName,
+                Address1: $scope.Address1,
+                Address2: $scope.Address2,
+                City: $scope.City,
+                Post: $scope.Post
+            };
+            var url = '@Url.Action("Create")';
+            $http.post(url, trader).then(function (response) {
+                if (response.data.success === false) {
+                    if ($scope.AddNewForm.$invalid) {
+                        toaster.error('ERROR', 'Creating New Trader Error');
+                        return;
+                    } else {
+                        toaster.success({ title: 'CREATE NEW TRADER', body: $scope.LegalName + ' Created Successfully' });
+                        $scope.query();
+                        $scope.reset();
+                    }
+                } else {
+                    toaster.success({ title: 'CREATE NEW TRADER', body: $scope.LegalName + ' Created Successfully' });
+                    $scope.query();
+                    $scope.reset();
+                }
+            },
+            function () {
+                toaster.error('ERROR', 'Internal Server Error');
+            });
+        };// create
+        $scope.update = function () {
+            var trader = {
+                Id: $scope.Id,
+                LegalName: $scope.LegalName,
+                TradingName: $scope.TradingName,
+                Address1: $scope.Address1,
+                Address2: $scope.Address2,
+                City: $scope.City,
+                Post: $scope.Post,
+            };
+            var url = '@Url.Action("Update")';
+            $http.post(url, trader).then(function (response) {
+                if (response.data.success === true) {
+                    if ($scope.UpdateTraderForm.$invalid) {
+                        toaster.error('ERROR', 'TraderId #' + $scope.Id + ' Cannot Update');
+                        return;
+                    } else {
+                        toaster.success({ title: 'UPDATE TRADER', body: 'TraderId #' + $scope.Id + ' Updated Successfully' });
+                        $scope.query();
+                        $scope.reset();
+                    }
+                } else {
+                    toaster.success({ title: 'UPDATE TRADER', body: 'TraderId #' + $scope.Id + ' Updated Successfully' });
+                    $scope.query();
+                    $scope.reset();
+                }
+            },
+            function () {
+                toaster.error('ERROR', 'Internal Server Error');
+            });
+        };// update
+        $scope.delete = function () {
+            var trader = {
+                Id: $scope.Id
+            };
+            var url = '@Url.Action("Delete")';
+            $http.post(url, trader).then(function (response) {
+                if (response.data.success === false) {
+                    toaster.error('ERROR', 'TraderId #' + $scope.Id + ' Cannot Delete');
+                    return;
+                } else {
+                    toaster.success({ title: 'DELETE TRADER', body: 'TraderId #' + $scope.Id + ' Deleted Successfully'  });
+                    $scope.query();
+                    $scope.reset();
+                }
+            },
+            function () {
+                toaster.error('ERROR', 'Internal Server Error');
+            });
+        };// delete
+        $scope.regexzip = /^(\d{5}(-\d{4})?|[A-Z]\d[A-Z] *\d[A-Z]\d)$/;
+        $scope.regexadr = /^\d+\s[A-z.]+\s[A-z]+\s[A-z .]+$/;
+    });
+    module.directive('traderTable', function () {
+        return {
+            template: `<table class="table table-bordered table-responsive">
+            <thead style="background-color:lightskyblue;">
+                <tr style=" text-shadow: 1px 1px lightcyan; color: darkslategrey; font-weight: 500; font-family: sans-serif; font-size: small">
+                    <th>#</th>
+                    <th>LEGAL, TRADEER</th>
+                    <th>STREET ADDRESS</th>
+                    <th>ID: CREATED ON, TRADERID</th>
+                    <th>
+                        <button type="button" class="btn btn-warning btn-block" data-target="#AddNew" data-toggle="modal" id="btnAddTrader">
+                            <b style="text-shadow: 1px 1px lightcyan; color:darkslategray; font-weight:700; font-family:sans-serif">CREATE TRADER</b>
+                        </button>
+                    </th>
+                </tr>
+            </thead>
+            <tbody style="background-color:mintcream;">
+                <tr ng-repeat="tdr in model.Addresses" style="font-family: sans-serif; font-weight:bold;">
+                    <td>{{$index+1}}</td>
+                    <td>{{tdr.Trader.LegalName}} {{ ', ' + tdr.Trader.TradingName}}</td>
+                    <td>{{tdr.Address1}} {{tdr.Address2}}, {{tdr.City}} {{tdr.Post}}</td>
+                    <td>{{ tdr.Id + ' : '}} {{tdr.UpdatedOn.slice(6,19) | date: 'MM/dd/yyyy h:mm a'}}, {{tdr.TraderId}}</td>
+                    <td style="width:185px;">
+                        <a href="#" ng-click="trader(tdr)" class="btn btn-success" data-toggle="modal" data-target="#UpdateModal">
+                            <b style="text-shadow: 1px 1px #dc3b76; color:honeydew; font-weight:700; font-family:sans-serif">UPDATE</b>
+                        </a>
+                        <a href="#" ng-click="trader(tdr)" class="btn btn-danger" data-toggle="modal" data-target="#deleteDialog">
+                            <b style="text-shadow: 1px 1px #808080; color:azure; font-weight:700; font-family:sans-serif">DELETE</b>
+                        </a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>`,
+        };
+    });
+    module.directive('traderValidation', function ($compile) {
+        return {
+            restrict: 'E',
+            scope: {
+                validate: '=',
+            },
+            link: function (scope, element, attrs) {
+                scope.field = attrs.field;
+                scope.pattern = attrs.pattern;
+                scope.fontstyle = 'font-weight:bold; font-style:normal; color:#808080; font-family:sans-serif';
+            },
+            template:
+                '<span class="errors" ng-messages="validate">' +
+                    '<span ng-message="required"><span style="{{fontstyle}}">REQUIRED FIELD: </span> Please enter your {{ field }}.</span>' +
+                    '<span ng-message="maxlength"><span style="{{fontstyle}}">MAXIMUM LENGTH:</span> Maximum 50 characers for {{ field }}.</span>' +
+                    '<span ng-message="pattern"><span style="{{fontstyle}}">INVALID FIELD:</span> {{ pattern }}.</span>' +
+                '</span>',
+        };
+    });
+</script>
+
+<div ng-app="ms.module" ng-controller="TraderController" ng-init="query()">
+    @*Trader Information*@
+    <div class="panel panel-default">
+        <div class="panel-heading" style="background-color:dodgerblue; text-align: center">
+            <h3 style="color:blanchedalmond">
+                <b style="text-shadow: 1px 1px #808080; color:honeydew ;  font-weight:700; font-family:sans-serif">TRADER INFORMATION</b>
+            </h3>
+        </div>
+        <div class="panel-body" style="background-color:lightskyblue; text-align: center">
+            <toaster-container toaster-options="{ 'close-button' : true, 'time-out':{ 'toast-success': 5000, 'toast-error': 5000 }, 'animation-class': 'toast-top-center' }"></toaster-container>
+        </div>
+        <trader-table></trader-table>
+    </div>
+    @*Create Trader*@
+    <div class="modal" id="AddNew" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="reset()">&times;</button>
+                    <h3 class="text-info" style="text-align:center">
+                        <b style="text-shadow: 1px 1px #2b1e1e; color:black; font-weight:700; font-family:sans-serif">CREATE NEW TRADER</b>
+                    </h3>
+                </div>
+                <div class="modal-body form-row align-items-center" style="margin-left:50px;">
+                    <form class="form-horizontal " name="AddNewForm" novalidate>
+                        <div class="form-group">
+                            <input class="form-control" readonly="readonly" name="Id" ng-model="Id" type="hidden" placeholder="Id" />
+                        </div>
+                        <!--LegalName-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">Legal Name</label>
+                            <input ng-model="LegalName" required ng-maxlength="50" class="form-control" style="font-weight: 700; font-size:large; font-family: sans-serif" type="text" name="LegalName">
+                            <trader-validation validate="(AddNewForm.LegalName.$touched && AddNewForm.LegalName.$error)" field="legal name"></trader-validation>
+                        </div>
+                        <!--TradingName-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">Trading Name</label>
+                            <input ng-model="TradingName" ng-maxlength="50" class="form-control" style="font-weight:700; font-size:large; font-family:sans-serif" type="text" name="TradingName">
+                            <trader-validation validate="(AddNewForm.TradingName.$touched && AddNewForm.TradingName.$error)" field="trading name"></trader-validation>
+                        </div>
+                        <!--Address1-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">Street Address</label>
+                            <input ng-model="Address1" required ng-pattern="regexadr" ng-maxlength="50"class="form-control" style="font-weight:700; font-size:large; font-family:sans-serif" type="text" name="Address1">
+                            <trader-validation validate="(AddNewForm.Address1.$touched && AddNewForm.Address1.$error)" field="street address" pattern="Street address requires digits, direction, name and type"></trader-validation>                        
+                        </div>
+                        <!--Address2-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">Address2:</label>
+                            <input ng-model="Address2" ng-maxlength="50" class="form-control" style="font-weight:700; font-size:large; font-family:sans-serif" type="text" name="Address2">
+                            <trader-validation validate="(AddNewForm.Address2.$touched && AddNewForm.Address2.$error)" field="address"></trader-validation>                        
+                        </div>
+                        <!--City-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">City</label>
+                            <input ng-model="City" required ng-maxlength="50" class="form-control" style="font-weight:700; font-size:large; font-family:sans-serif" type="text" name="City">
+                            <trader-validation validate="(AddNewForm.City.$touched && AddNewForm.City.$error)" field="city"></trader-validation>                        
+                        </div>
+                        <!--Post-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">Post Code</label>
+                            <input ng-model="Post" required ng-pattern="regexzip" ng-maxlength="50" class="form-control" style="font-weight:700; font-size:large; font-family:sans-serif" type="text" name="Post" />
+                            <trader-validation validate="(AddNewForm.Post.$touched && AddNewForm.Post.$error)" field="postal code" pattern="Postal code requires at least 5 digits"></trader-validation>                        
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer btn-group-lg">
+                    <button type="button" class="btn btn-primary btn-lg btn-block" id="btnSave" ng-click="create()" ng-disabled="(!AddNewForm.$valid)"><b>Submit</b></button>
+                    <button type="button" class="btn btn-default btn-outline-warning btn-lg btn-block" data-dismiss="modal" ng-click="reset()"><b>Close</b></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*Upadate Trader*@
+    <div class="modal" id="UpdateModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="reset()">&times;</button>
+                    <h3 h3 class="text-info" style="text-align:center">
+                        <b style="text-shadow: 1px 1px #2b1e1e; color:black; font-weight:700; font-family:sans-serif">UPDATE TRADER ID #</b>
+                        <span style="color:crimson; font-size:larger; font-weight:bolder">{{Id}}</span>
+                    </h3>
+                </div>
+                <div class="modal-body" style="margin-left:50px;">
+                    <form class="form-horizontal " name="UpdateTraderForm" novalidate>
+                        <div class="form-group">
+                            <input class="form-control" readonly="readonly" name="Id" ng-model="Id" type="hidden" placeholder="Id" />
+                        </div>
+                        <!--LegalName-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">Legal Name</label>
+                            <input ng-model="LegalName" required ng-maxlength="50" class="form-control" style="font-weight: 700; font-size:large; font-family: sans-serif" type="text" name="LegalName">
+                            <trader-validation validate="(UpdateTraderForm.LegalName.$touched && UpdateTraderForm.LegalName.$error)" field="legal name"></trader-validation>
+                        </div>
+                        <!--TradingName-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">Trading Name</label>
+                            <input ng-model="TradingName" ng-maxlength="50" class="form-control" style="font-weight:700; font-size:large; font-family:sans-serif" type="text" name="TradingName">
+                            <trader-validation validate="(UpdateTraderForm.TradingName.$touched && UpdateTraderForm.TradingName.$error)" field="trading name"></trader-validation>
+                        </div>
+                        <!--Address1-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">Street Address</label>
+                            <input ng-model="Address1" required ng-pattern="regexadr" ng-maxlength="50" class="form-control" style="font-weight:700; font-size:large; font-family:sans-serif" type="text" name="Address1">
+                            <trader-validation validate="(UpdateTraderForm.Address1.$touched && UpdateTraderForm.Address1.$error)" field="street address" pattern="Street address requires digits, direction, name and type"></trader-validation>
+                        </div>
+                        <!--Address2-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">Address2:</label>
+                            <input ng-model="Address2" ng-maxlength="50" class="form-control" style="font-weight:700; font-size:large; font-family:sans-serif" type="text" name="Address2">
+                            <trader-validation validate="(UpdateTraderForm.Address2.$touched && UpdateTraderForm.Address2.$error)" field="address"></trader-validation>
+                        </div>
+                        <!--City-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">City</label>
+                            <input ng-model="City" required ng-maxlength="50" class="form-control" style="font-weight:700; font-size:large; font-family:sans-serif" type="text" name="City">
+                            <trader-validation validate="(UpdateTraderForm.City.$touched && UpdateTraderForm.City.$error)" field="city"></trader-validation>
+                        </div>
+                        <!--Post-->
+                        <div class="form-group">
+                            <label class="control-label text-info h4" style="font-family:sans-serif; font-weight:bold;">Post Code</label>
+                            <input ng-model="Post" required ng-pattern="regexzip" ng-maxlength="50" class="form-control" style="font-weight:700; font-size:large; font-family:sans-serif" type="text" name="Post" />
+                            <trader-validation validate="(UpdateTraderForm.Post.$touched && UpdateTraderForm.Post.$error)" field="postal code" pattern="Postal code requires at least 5 digits"></trader-validation>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer btn-group-lg">
+                    <button type="button" class="btn btn-primary btn-lg btn-block" id="btnSave" ng-click="update()" ng-disabled="(!UpdateTraderForm.$valid)"><b>Submit</b></button>
+                    <button type="button" class="btn btn-default btn-outline-warning btn-lg btn-block" data-dismiss="modal" ng-click="reset()"><b>Close</b></button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @*Delete Trader*@
+    <div class="modal" role="dialog" id="deleteDialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" ng-click="reset()">&times;</button>
+                    <h3 h3 class="text-info" style="text-align:center">
+                        <b style="text-shadow: 1px 1px #2b1e1e; color:black; font-weight:700; font-family:sans-serif">DELETE TRADER ID #</b>
+                        <span style="font-size:larger; color:crimson; font-weight:bolder">{{Id}}</span>
+                    </h3>
+                </div>
+                <div class="modal-body" style="margin-left:20px; text-align:center">
+                    <div style="align-content:center">
+                        <p style="font-weight:700; font-family:sans-serif; font-size:large">Updated On:<span class="errors" style="font-size:medium">{{UpdatedOn.slice(6,19) | date: 'MM/dd/yyyy h:mm a'}}</span></p>
+                    </div>
+                </div>
+                <div class="modal-footer btn-group-lg">
+                    <button type="button" class="btn btn-primary btn-lg btn-block" data-dismiss="modal" ng-click="delete()"><b>Submit</b></button>
+                    <button type="button" class="btn btn-default btn-outline-warning btn-lg btn-block" data-dismiss="modal" ng-click="reset()"><b>Close</b></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
