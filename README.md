@@ -1,38 +1,42 @@
 # Asp.Net.Mvc 
 
-## DOWNLOAD:
+### DOWNLOAD:
 
-### 1. [Visual Studio Community](https://visualstudio.microsoft.com/vs/community/)
+1. [Visual Studion Community][1]; &nbsp; 2. [SQL Server 2019 Express][2]; &nbsp; 3. [QL Server Management Studio (SSMS)][3]
 
-### 2. [SQL Server 2019 Express](https://www.microsoft.com/en-us/sql-server/sql-server-downloads)
+---
 
-### 3. [SQL Server Management Studio (SSMS)](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms)
+### LIBRARY:
 
-## LIBRARIES (READ):
+4. [Mediatr][4]; &nbsp; 5. [AutoMapper][5]; &nbsp; 6. [Autofac][6]; &nbsp; 7. [Entity Framework][7]
 
-### 1. [Mediatr](https://github.com/jbogard/MediatR/wiki)
+---
 
-### 2. [AutoMapper](https://automapper.org/)
+### SETUP:
 
-### 3. [Autofac](https://autofac.org/)
+8. <a href="">Open ../MS.Database/MS.Database.csproj, then change connection string. Right click Solution 'app' -> properties -> change from app to MS.Database</a>![alt text][8]<br /><a href="">Result</a> <br />![alt text][8a]
 
-### 4. [Entity Framework](https://docs.microsoft.com/en-us/ef/#pivot=ef6x)
+---
 
-## SETUP DATABASE:
+9. <a href="">Create new query and write \'CREATE SCHEMA [migra] GO\'. Then execute.</a>![alt text][9]
 
-### 1. Install SQL Server 2019 Express && Install SQL Server Management Studio (SSMS)
+---
 
-### 2. ![Run SSMS, connect to the server and create a new database](/images/logo.png)
+10. <a href="">Close VS and Open app.s1n, then change connection string. Right click Solution 'app' -> properties -> change from MS.Database to app. Run the application.</a>![alt text][10]
 
-### 3. Run SQL Script on the newly created database
-
-### 4. Open Visual Studio and open the solution && Open MS.Database.Program.cs
-
-
-## RUN APP
-
-### 1. Open app.Web.config and update the connection string to match your server
-
+---
 
 # **_DON'T PUSH TO MASTER!!!_**
-#### We'll push to different branches. Let me know when you guys get the app running or need help.
+#### We'll push to different branches and if we're in the same group I can explain the archectiure.
+
+[1]: https://visualstudio.microsoft.com/vs/community/                                             "Visual Studion Community"
+[2]: https://www.microsoft.com/en-us/sql-server/sql-server-downloads/                             "SQL Server 2019 Express"
+[3]: https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms/        "SQL Server Management Studio (SSMS)"
+[4]: https://github.com/jbogard/MediatR/wiki/                                                     "Mediatr"
+[5]: https://automapper.org/                                                                      "AutoMapper"
+[6]: https://docs.microsoft.com/en-us/ef/#pivot=ef6x/                                             "Autofac"
+[7]: https://visualstudio.microsoft.com/vs/community/                                             "Entity Framework"
+[8]: /images/connection.png                                                                       "Database"
+[8a]: /images/dbscript.png                                                                         "DBSuccess"
+[9]: /images/script.png                                                                          "Schema"
+[10]: /images/webconfig.png                                                                       "Connection"
