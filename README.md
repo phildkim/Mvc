@@ -26,7 +26,6 @@
 
 ---
 
-# **_DON'T PUSH TO MASTER!!!_**
 #### We'll push to different branches and if we're in the same group I can explain the archectiure.
 
 [1]: https://visualstudio.microsoft.com/vs/community/                                             "Visual Studion Community"
