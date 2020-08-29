@@ -25,5 +25,6 @@
             };
         }
         public IEnumerable<AddressVM> Addresses { get; set; }
+        public IEnumerable<TraderVM> Traders { get; set; }
     }
 }
