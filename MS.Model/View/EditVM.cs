@@ -1,7 +1,5 @@
 ﻿namespace MS.Model.View
 {
-    using AutoMapper;
-    using MS.Model.Entity;
     using System.Collections.Generic;
     public class EditVM : BaseVM
     {
